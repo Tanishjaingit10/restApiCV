@@ -35,14 +35,14 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    path('admin', admin.site.urls),
+    path('admin/', admin.site.urls),
     path('signup',SignupAPIView.as_view()),
     path('allUsers',ViewUsersAPIView.as_view()),
     path('allResumes',ResumeAPIView.as_view()),
     path('getUser/<int:pk>',GetUserAPIView.as_view()),
-    # path('o/',include('oauth2_provider.urls',namespace="oauth2_provider")),
+    path('getDetailedUser/<int:pk>',GetDetailedUserAPIView.as_view()),
     path('updateUser/<int:pk>',UpdateUserAPIView.as_view()),
-    # path('getUser/<pk>',GetUserAPIView.as_view()),
+    path('viewResumeOfUser/<int:pk>',UserResumeAPIView.as_view()),
     path('', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]

@@ -15,27 +15,37 @@ class UserSerilizer(serializers.ModelSerializer):
         fields = ['id', 'name', 'resume', 'email', 'password']
         depth = 1
 
-class UpdateUserSerializer(serializers.ModelSerializer):
-    resume = serializers.FileField()
+
+class DetailedUserSerilizer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['name','resume','email','password']
+        fields = ['id', 'name', 'resume', 'all_resume', 'email', 'password']
+        depth = 1
 
-    def update(self, validated_data):
+
+class UpdateUserSerializer(serializers.ModelSerializer):
+    resume = serializers.FileField()
+
+    class Meta:
+        model = User
+        fields = ['id', 'name', 'resume', 'email', 'password']
+        depth = 1
+
+    def update(self, instance, validated_data):
         name = validated_data.get('name')
         email = validated_data.get('email')
         resume = validated_data.get('resume')
-        print(resume)
-        # password = validated_data.get('password')
-        # if password1 == password2:
-        #     user = User(name=name, email=email, resume=resume)
-        #     user.set_password(password1)
-        #     user.save()
-        #     return user
-        # else:
-        #     raise serializers.ValidationError({
-        #         'error': 'Passwords do not Match'
-        #     })
+        password = validated_data.get('password')
+        resume = Resume(text=resume.name, resume=resume)
+        resume.save()
+        user = instance
+        user.name = name
+        user.email = email
+        user.set_password(password)
+        user.all_resume.add(resume)
+        user.save()
+        return user
+
 
 class RegisterUserSerializer(serializers.ModelSerializer):
     resume = serializers.FileField()
@@ -56,14 +66,16 @@ class RegisterUserSerializer(serializers.ModelSerializer):
         resume = validated_data.get('resume')
         password1 = validated_data.get('password1')
         password2 = validated_data.get('password2')
-        resume = Resume(text=resume.name,resume=resume)
+        resume = Resume(text=resume.name, resume=resume)
         if password1 == password2:
             resume.save()
             user = User(name=name, email=email, resume=resume)
             user.set_password(password1)
             user.save()
+            user.all_resume.add(resume)
+            user.save()
             return user
         else:
-            raise serializers.ValidationError({
-                'error': 'Passwords do not Match'
-            })
+            raise serializers.ValidationError(
+                {'error': 'Passwords do not Match'}
+            )

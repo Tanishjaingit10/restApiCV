@@ -45,7 +45,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     name = models.CharField(max_length=254, null=True, blank=True)
     resume = models.OneToOneField(
         Resume, related_name='UserResume', on_delete=models.CASCADE, null=True)
-    old_resume = models.ManyToManyField(Resume, related_name="old_resume")
+    all_resume = models.ManyToManyField(Resume, related_name="all_resume")
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)

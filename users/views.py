@@ -30,8 +30,19 @@ class GetUserAPIView(APIView):
             data = ser.data
             del data["password"]
             return Response(data)
-        except:
-            return Response({})
+        except Exception as e:
+            return Response(str(e))
+
+class GetDetailedUserAPIView(APIView):
+    def get(self, req, pk):
+        try:
+            user = User.objects.get(pk=pk)
+            ser = DetailedUserSerilizer(user)
+            data = ser.data
+            del data["password"]
+            return Response(data)
+        except Exception as e:
+            return Response(str(e))
         
 class SignupAPIView(APIView):
     serializer_class = RegisterUserSerializer
@@ -55,13 +66,26 @@ class UpdateUserAPIView(APIView):
     def put(self,req,pk):
         try:
             user = User.objects.get(pk=pk)
-            print(req.data)
-        except:
-            pass
-        return Response(1000)
+            ser = UpdateUserSerializer(user,data=req.data)
+            if ser.is_valid():
+                ser.save()
+                return Response(ser.data)
+            else: return Response(ser.errors)
+        except Exception as e:
+            return Response(str(e))
 
 class ResumeAPIView(APIView):
     def get(self,req):
         resume = Resume.objects.all()
         ser = ResumeSerilizer(resume,many=True)
         return Response(ser.data)
+
+class UserResumeAPIView(APIView):
+    def get(self,req,pk):
+        try:
+            user = User.objects.get(pk=pk)
+            print(user.all_resume)
+            ser = ResumeSerilizer(user.all_resume,many=True)
+            return Response(ser.data)
+        except Exception as e:
+            Response(str(e))
